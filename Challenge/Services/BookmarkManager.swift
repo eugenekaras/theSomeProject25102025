@@ -24,8 +24,8 @@ class BookmarkManager {
     }
     
     /// Check if a user is bookmarked
-    func isBookmarked(_ user: User) -> Bool {
-        return bookmarkedUsers.contains(where: { $0.uniqueID == user.uniqueID })
+    func isBookmarked(_ userID: String) -> Bool {
+        return bookmarkedUsers.contains(where: { $0.uniqueID == userID })
     }
     
     /// Add a user to bookmarks
@@ -62,7 +62,7 @@ class BookmarkManager {
     
     /// Toggle bookmark status for a user
     func toggleBookmark(_ user: User) {
-        if isBookmarked(user) {
+        if isBookmarked(user.uniqueID) {
             removeBookmark(user)
         } else {
             addBookmark(user)

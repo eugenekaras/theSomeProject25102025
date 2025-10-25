@@ -48,7 +48,7 @@ class UserDetailViewModel {
     
     /// Check if user is currently bookmarked
     var isBookmarked: Bool {
-        return bookmarkManager.isBookmarked(user)
+        return bookmarkManager.isBookmarked(user.uniqueID)
     }
     
     /// Get placeholder image with user initials

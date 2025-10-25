@@ -164,9 +164,9 @@ class UsersListViewController: UIViewController {
         for cell in tableView.visibleCells {
             guard let userCell = cell as? UserTableViewCell,
                   let indexPath = tableView.indexPath(for: cell),
-                  let user = viewModel.user(at: indexPath.row) else { continue }
+                  let userCellViewModel = viewModel.userCellViewModel(at: indexPath.row) else { continue }
             
-            userCell.configure(with: user)
+            userCell.configure(with: userCellViewModel)
         }
     }
     
@@ -199,8 +199,8 @@ extension UsersListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        if let user = viewModel.user(at: indexPath.row) {
-            cell.configure(with: user)
+        if let userCellViewModel = viewModel.userCellViewModel(at: indexPath.row) {
+            cell.configure(with: userCellViewModel)
             cell.delegate = self
         }
         
@@ -234,8 +234,8 @@ extension UsersListViewController: UISearchResultsUpdating {
 
 // MARK: - UserTableViewCellDelegate
 extension UsersListViewController: UserTableViewCellDelegate {
-    func didTapBookmark(for user: User) {
-        if let index = viewModel.currentUsers.firstIndex(of: user) {
+    func didTapBookmark(for userID: String) {
+        if let index = viewModel.indexOfUser(withID: userID) {
             viewModel.toggleBookmark(at: index)
         }
     }

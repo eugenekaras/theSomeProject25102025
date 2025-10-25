@@ -1,14 +1,14 @@
 import UIKit
 
 protocol UserTableViewCellDelegate: AnyObject {
-    func didTapBookmark(for user: User)
+    func didTapBookmark(for userID: String)
 }
 
 class UserTableViewCell: UITableViewCell {
     static let identifier = "UserTableViewCell"
     
     weak var delegate: UserTableViewCellDelegate?
-    private var user: User?
+    private var viewModel: UserCellViewModel?
     
     // MARK: - UI Elements
     private let avatarImageView: UIImageView = {
@@ -119,42 +119,35 @@ class UserTableViewCell: UITableViewCell {
     }
     
     // MARK: - Configuration
-    func configure(with user: User) {
-        self.user = user
+    func configure(with viewModel: UserCellViewModel) {
+        self.viewModel = viewModel
         
-        nameLabel.text = user.fullName
-        emailLabel.text = user.email
-        locationLabel.text = "\(user.location.city), \(user.location.country)"
+        nameLabel.text = viewModel.fullName
+        emailLabel.text = viewModel.email
+        locationLabel.text = viewModel.locationText
         
         // Update bookmark button state
-        bookmarkButton.isSelected = BookmarkManager.shared.isBookmarked(user)
+        bookmarkButton.isSelected = viewModel.isBookmarked
+        
+        // Show placeholder with user initials while loading
+        avatarImageView.image = UIImage.placeholder(initials: viewModel.initials, size: CGSize(width: 60, height: 60))
         
         // Load avatar image
-        loadAvatar(from: user.picture.thumbnail)
-    }
-    
-    private func loadAvatar(from urlString: String) {
-        // Show placeholder with user initials while loading
-        if let user = user {
-            let firstInitial = user.name.first.first.map(String.init) ?? ""
-            let lastInitial = user.name.last.first.map(String.init) ?? ""
-            let initials = "\(firstInitial)\(lastInitial)"
-            avatarImageView.image = UIImage.placeholder(initials: initials, size: CGSize(width: 60, height: 60))
-        }
-        
-        ImageLoadingService.shared.loadImage(from: urlString) { [weak self] (image: UIImage?) in
-            if let image = image {
-                self?.avatarImageView.image = image
+        if let url = viewModel.avatarURL {
+            ImageLoadingService.shared.loadImage(from: url) { [weak self] (image: UIImage?) in
+                if let image = image {
+                    self?.avatarImageView.image = image
+                }
             }
         }
     }
     
     @objc private func bookmarkTapped() {
-        guard let user = user else { return }
-        delegate?.didTapBookmark(for: user)
+        guard let vm = viewModel else { return }
+        delegate?.didTapBookmark(for: vm.userID)
         
         // Update button state immediately for better UX
-        bookmarkButton.isSelected = BookmarkManager.shared.isBookmarked(user)
+        bookmarkButton.isSelected = BookmarkManager.shared.isBookmarked(vm.userID)
         
         // Add a little animation
         UIView.animate(withDuration: 0.1, animations: {
@@ -168,10 +161,8 @@ class UserTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        if let user = user {
-            let firstInitial = user.name.first.first.map(String.init) ?? ""
-            let lastInitial = user.name.last.first.map(String.init) ?? ""
-            let initials = "\(firstInitial)\(lastInitial)"
+        if let vm = viewModel {
+            let initials = vm.initials
             avatarImageView.image = UIImage.placeholder(initials: initials, size: CGSize(width: 60, height: 60))
         } else {
             avatarImageView.image = UIImage(systemName: "person.circle.fill")
@@ -180,6 +171,6 @@ class UserTableViewCell: UITableViewCell {
         emailLabel.text = nil
         locationLabel.text = nil
         bookmarkButton.isSelected = false
-        user = nil
+        viewModel = nil
     }
 }

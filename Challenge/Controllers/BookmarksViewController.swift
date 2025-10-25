@@ -213,8 +213,8 @@ extension BookmarksViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        if let user = viewModel.user(at: indexPath.row) {
-            cell.configure(with: user)
+        if let userCellViewModel = viewModel.userCellViewModel(at: indexPath.row) {
+            cell.configure(with: userCellViewModel)
             cell.delegate = self
         }
         
@@ -239,8 +239,8 @@ extension BookmarksViewController: UITableViewDelegate {
 
 // MARK: - UserTableViewCellDelegate
 extension BookmarksViewController: UserTableViewCellDelegate {
-    func didTapBookmark(for user: User) {
-        if let index = viewModel.bookmarkedUsers.firstIndex(of: user) {
+    func didTapBookmark(for userID: String) {
+        if let index = viewModel.indexOfUser(withID: userID) {
             viewModel.toggleBookmark(at: index)
         }
     }

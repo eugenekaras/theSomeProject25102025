@@ -49,6 +49,24 @@ class BookmarksViewModel {
         return bookmarkedUsers[index]
     }
     
+    /// Get user  presentation model at specific index
+    func userCellViewModel(at index: Int) -> UserCellViewModel? {
+        let dataSource = bookmarkedUsers
+        guard index >= 0 && index < dataSource.count else { return nil }
+        
+        let user = dataSource[index]
+        let userCellViewModel = UserCellViewModel(
+            user: user,
+            isBookmarked: BookmarkManager.shared.isBookmarked(user.uniqueID)
+        )
+        return userCellViewModel
+    }
+    
+    /// Get index of user at uniqueID
+    func indexOfUser(withID id: String) -> Int?  {
+        bookmarkedUsers.firstIndex { $0.uniqueID == id }
+    }
+    
     /// Remove bookmark at specific index
     func removeBookmark(at index: Int) {
         guard let user = user(at: index) else { return }
@@ -65,7 +83,7 @@ class BookmarksViewModel {
     /// Check if user at index is bookmarked (should always be true in this context)
     func isBookmarked(at index: Int) -> Bool {
         guard let user = user(at: index) else { return false }
-        return bookmarkManager.isBookmarked(user)
+        return bookmarkManager.isBookmarked(user.uniqueID)
     }
     
     /// Clear all bookmarks

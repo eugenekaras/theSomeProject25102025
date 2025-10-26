@@ -1,4 +1,5 @@
 import Foundation
+import Network
 
 // MARK: - NetworkError
 enum NetworkError: Error, LocalizedError {
@@ -7,6 +8,7 @@ enum NetworkError: Error, LocalizedError {
     case decodingError(Error)
     case networkError(Error)
     case httpError(Int)
+    case noInternet
     
     var errorDescription: String? {
         switch self {
@@ -20,6 +22,8 @@ enum NetworkError: Error, LocalizedError {
             return "Network error: \(error.localizedDescription)"
         case .httpError(let statusCode):
             return "HTTP error with status code: \(statusCode)"
+        case .noInternet:
+            return "No internet connection"
         }
     }
 }
@@ -31,15 +35,36 @@ class APIService {
     private let baseURL = "https://randomuser.me/api/"
     private let session: URLSession
     
+    // Network Monitor
+    private let monitor = NWPathMonitor()
+    private let monitorQueue = DispatchQueue(label: "NetworkMonitor")
+    private var isConnected: Bool = true
+    
     private init() {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30
         configuration.timeoutIntervalForResource = 60
         self.session = URLSession(configuration: configuration)
+        
+        // Start network monitoring
+        monitor.pathUpdateHandler = { [weak self] path in
+            self?.isConnected = path.status == .satisfied
+        }
+        monitor.start(queue: monitorQueue)
+    }
+    
+    deinit {
+        monitor.cancel() // free up monitor
     }
     
     // MARK: - Fetch Users
-    func fetchUsers(page: Int, results: Int = 25, seed: String? = nil, completion: @escaping (Result<RandomUserResponse, NetworkError>) -> Void) {
+    func fetchUsers(page: Int, results: Int = 25, seed: String? = nil, retries: Int = 2, delay: Double = 1.0, completion: @escaping (Result<RandomUserResponse, NetworkError>) -> Void) {
+        
+        guard isConnected else {
+            completion(.failure(.noInternet))
+            return
+        }
+        
         var components = URLComponents(string: baseURL)
         
         var queryItems = [
@@ -61,9 +86,16 @@ class APIService {
         
         print("🌐 Fetching users from: \(url.absoluteString)")
         
-        session.dataTask(with: url) { data, response, error in
+        session.dataTask(with: url) { [weak self] data, response, error in
             if let error = error {
-                completion(.failure(.networkError(error)))
+                if retries > 0 {
+                    print("Network error, retrying in \(delay)s (\(retries) left)")
+                    DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+                        self?.fetchUsers(page: page, results: results, retries: retries - 1, completion: completion)
+                    }
+                } else {
+                    completion(.failure(.networkError(error)))
+                }
                 return
             }
             
@@ -87,5 +119,10 @@ class APIService {
                 completion(.failure(.decodingError(error)))
             }
         }.resume()
+    }
+    
+    // MARK: - Current network status
+    func currentNetworkStatus() -> Bool {
+        return isConnected
     }
 }

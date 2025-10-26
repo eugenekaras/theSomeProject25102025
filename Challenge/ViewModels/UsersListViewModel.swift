@@ -20,7 +20,13 @@ class UsersListViewModel {
     private(set) var hasMoreData = true
     
     private var currentPage = 1
-    private var apiSeed: String?
+    
+    private var apiSeed: String? = PaginationState.seed {
+        didSet {
+            PaginationState.seed = apiSeed
+        }
+    }
+    
     private var currentSearchText = ""
     
     private let apiService = APIService.shared
@@ -192,5 +198,15 @@ extension UsersListViewModel {
     /// Check if should show loading indicator
     func shouldShowInitialLoading() -> Bool {
         return isLoading && users.isEmpty
+    }
+}
+
+// MARK: - Pagination State (UserDefaults)
+extension UsersListViewModel {
+    struct PaginationState {
+        static var seed: String? {
+            get { UserDefaults.standard.string(forKey: "seed") }
+            set { UserDefaults.standard.set(newValue, forKey: "seed") }
+        }
     }
 }

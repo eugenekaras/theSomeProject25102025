@@ -48,40 +48,42 @@ class UsersListViewModel {
         delegate?.didStartLoading()
         
         apiService.fetchUsers(page: currentPage, seed: apiSeed) { [weak self] result in
-            guard let self = self else { return }
-            
-            self.isLoading = false
-            self.delegate?.didFinishLoading()
-            
-            switch result {
-            case .success(let response):
-                // Store seed for consistent pagination
-                if self.apiSeed == nil {
-                    self.apiSeed = response.info.seed
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                
+                self.isLoading = false
+                self.delegate?.didFinishLoading()
+                
+                switch result {
+                case .success(let response):
+                    // Store seed for consistent pagination
+                    if self.apiSeed == nil {
+                        self.apiSeed = response.info.seed
+                    }
+                    
+                    if self.currentPage == 1 {
+                        self.users = response.results
+                    } else {
+                        self.users.append(contentsOf: response.results)
+                    }
+                    
+                    self.currentPage += 1
+                    
+                    // Check if we have more data
+                    if response.results.count < 25 {
+                        self.hasMoreData = false
+                    }
+                    
+                    // Update search results if currently searching
+                    if self.isSearching {
+                        self.performSearch(with: self.currentSearchText)
+                    } else {
+                        self.delegate?.didUpdateUsers()
+                    }
+                    
+                case .failure(let error):
+                    self.delegate?.didReceiveError(error)
                 }
-                
-                if self.currentPage == 1 {
-                    self.users = response.results
-                } else {
-                    self.users.append(contentsOf: response.results)
-                }
-                
-                self.currentPage += 1
-                
-                // Check if we have more data
-                if response.results.count < 25 {
-                    self.hasMoreData = false
-                }
-                
-                // Update search results if currently searching
-                if self.isSearching {
-                    self.performSearch(with: self.currentSearchText)
-                } else {
-                    self.delegate?.didUpdateUsers()
-                }
-                
-            case .failure(let error):
-                self.delegate?.didReceiveError(error)
             }
         }
     }

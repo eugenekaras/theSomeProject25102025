@@ -62,31 +62,29 @@ class APIService {
         print("🌐 Fetching users from: \(url.absoluteString)")
         
         session.dataTask(with: url) { data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    completion(.failure(.networkError(error)))
-                    return
-                }
-                
-                if let httpResponse = response as? HTTPURLResponse,
-                   !(200...299).contains(httpResponse.statusCode) {
-                    completion(.failure(.httpError(httpResponse.statusCode)))
-                    return
-                }
-                
-                guard let data = data else {
-                    completion(.failure(.noData))
-                    return
-                }
-                
-                do {
-                    let randomUserResponse = try JSONDecoder().decode(RandomUserResponse.self, from: data)
-                    print("✅ Successfully fetched \(randomUserResponse.results.count) users")
-                    completion(.success(randomUserResponse))
-                } catch {
-                    print("❌ Decoding error: \(error)")
-                    completion(.failure(.decodingError(error)))
-                }
+            if let error = error {
+                completion(.failure(.networkError(error)))
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse,
+               !(200...299).contains(httpResponse.statusCode) {
+                completion(.failure(.httpError(httpResponse.statusCode)))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(.noData))
+                return
+            }
+            
+            do {
+                let randomUserResponse = try JSONDecoder().decode(RandomUserResponse.self, from: data)
+                print("✅ Successfully fetched \(randomUserResponse.results.count) users")
+                completion(.success(randomUserResponse))
+            } catch {
+                print("❌ Decoding error: \(error)")
+                completion(.failure(.decodingError(error)))
             }
         }.resume()
     }

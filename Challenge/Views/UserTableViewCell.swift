@@ -142,6 +142,10 @@ class UserTableViewCell: UITableViewCell {
         }
     }
     
+    func updateBookmark(isBookmarked: Bool) {
+        bookmarkButton.isSelected = isBookmarked
+    }
+    
     @objc private func bookmarkTapped() {
         guard let vm = viewModel else { return }
         delegate?.didTapBookmark(for: vm.userID)

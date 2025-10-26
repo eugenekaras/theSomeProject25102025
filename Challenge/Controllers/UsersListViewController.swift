@@ -157,19 +157,17 @@ class UsersListViewController: UIViewController {
     @objc private func bookmarkDidChange(_ notification: Notification) {
         DispatchQueue.main.async {
             // Update visible cells to reflect bookmark changes
-            self.updateVisibleCells()
+            self.updateVisibleBookmarkStates()
         }
     }
     
-    private func updateVisibleCells() {
+    private func updateVisibleBookmarkStates() {
         for cell in tableView.visibleCells {
             guard let userCell = cell as? UserTableViewCell,
                   let indexPath = tableView.indexPath(for: cell),
                   let userCellViewModel = viewModel.userCellViewModel(at: indexPath.row) else { continue }
             
-            userCell.configure(with: userCellViewModel) { url, completion in
-                self.imageService.loadImage(from: url, completion: completion)
-            }
+            userCell.updateBookmark(isBookmarked: userCellViewModel.isBookmarked)
         }
     }
     

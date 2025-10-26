@@ -5,6 +5,7 @@ class BookmarksViewController: UIViewController {
     // MARK: - Properties
     weak var coordinator: BookmarksCoordinator?
     private var viewModel = BookmarksViewModel()
+    private let imageService = ImageLoadingService.shared
     
     // MARK: - UI Elements
     private let tableView: UITableView = {
@@ -214,7 +215,9 @@ extension BookmarksViewController: UITableViewDataSource {
         }
         
         if let userCellViewModel = viewModel.userCellViewModel(at: indexPath.row) {
-            cell.configure(with: userCellViewModel)
+            cell.configure(with: userCellViewModel) { [weak self] url, completion in
+                self?.imageService.loadImage(from: url, completion: completion)
+            }
             cell.delegate = self
         }
         

@@ -119,7 +119,7 @@ class UserTableViewCell: UITableViewCell {
     }
     
     // MARK: - Configuration
-    func configure(with viewModel: UserCellViewModel) {
+    func configure(with viewModel: UserCellViewModel, loadImage: @escaping (String, @escaping (UIImage?) -> Void) -> Void) {
         self.viewModel = viewModel
         
         nameLabel.text = viewModel.fullName
@@ -134,7 +134,7 @@ class UserTableViewCell: UITableViewCell {
         
         // Load avatar image
         if let url = viewModel.avatarURL {
-            ImageLoadingService.shared.loadImage(from: url) { [weak self] (image: UIImage?) in
+            loadImage(url) { [weak self] image in
                 if let image = image {
                     self?.avatarImageView.image = image
                 }

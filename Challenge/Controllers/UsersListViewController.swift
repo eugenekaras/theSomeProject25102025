@@ -5,6 +5,7 @@ class UsersListViewController: UIViewController {
     // MARK: - Properties
     weak var coordinator: UsersListCoordinator?
     private var viewModel = UsersListViewModel()
+    private let imageService = ImageLoadingService.shared
     
     // MARK: - UI Elements
     private let tableView: UITableView = {
@@ -166,7 +167,9 @@ class UsersListViewController: UIViewController {
                   let indexPath = tableView.indexPath(for: cell),
                   let userCellViewModel = viewModel.userCellViewModel(at: indexPath.row) else { continue }
             
-            userCell.configure(with: userCellViewModel)
+            userCell.configure(with: userCellViewModel) { url, completion in
+                self.imageService.loadImage(from: url, completion: completion)
+            }
         }
     }
     
@@ -200,7 +203,9 @@ extension UsersListViewController: UITableViewDataSource {
         }
         
         if let userCellViewModel = viewModel.userCellViewModel(at: indexPath.row) {
-            cell.configure(with: userCellViewModel)
+            cell.configure(with: userCellViewModel) { [weak self] url, completion in
+                self?.imageService.loadImage(from: url, completion: completion)
+            }
             cell.delegate = self
         }
         

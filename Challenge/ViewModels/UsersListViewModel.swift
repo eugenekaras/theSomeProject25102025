@@ -98,7 +98,6 @@ class UsersListViewModel {
     func refreshUsers() {
         currentPage = 1
         hasMoreData = true
-        apiSeed = nil
         users.removeAll()
         
         // Clear search if active

@@ -151,7 +151,7 @@ class UserTableViewCell: UITableViewCell {
         delegate?.didTapBookmark(for: vm.userID)
         
         // Update button state immediately for better UX
-        bookmarkButton.isSelected = BookmarkManager.shared.isBookmarked(vm.userID)
+        bookmarkButton.isSelected.toggle()
         
         // Add a little animation
         UIView.animate(withDuration: 0.1, animations: {

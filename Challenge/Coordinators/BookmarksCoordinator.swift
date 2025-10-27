@@ -31,10 +31,11 @@ class BookmarksCoordinator: Coordinator {
         navigationController.pushViewController(bookmarksVC, animated: false)
     }
     
-    func showUserDetail(with viewModel: UserDetailViewModel) {
+    func showUserDetail(for user: User) {
         userDetailCoordinator = UserDetailCoordinator(
             navigationController: navigationController,
-            viewModel: viewModel
+            diContainer: diContainer,
+            user: user
         )
         userDetailCoordinator?.delegate = self
         userDetailCoordinator?.start()

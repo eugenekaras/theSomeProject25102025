@@ -5,14 +5,22 @@ protocol UserDetailCoordinatorDelegate: AnyObject {
 }
 
 class UserDetailCoordinator: Coordinator {
+    // MARK: - Dependencies
+    private let diContainer: DIContainer
+    
     weak var delegate: UserDetailCoordinatorDelegate?
     var navigationController: UINavigationController
     
-    private let viewModel: UserDetailViewModel
+    private let user: User
     
-    init(navigationController: UINavigationController, viewModel: UserDetailViewModel) {
+    init(
+        navigationController: UINavigationController,
+        diContainer: DIContainer,
+        user: User
+    ) {
         self.navigationController = navigationController
-        self.viewModel = viewModel
+        self.diContainer = diContainer
+        self.user = user
     }
     
     func start() {
@@ -20,6 +28,11 @@ class UserDetailCoordinator: Coordinator {
     }
     
     private func showUserDetail() {
+        let viewModel = UserDetailViewModel(
+            bookmarkService: diContainer.bookmarkService,
+            imageLoadingService: diContainer.imageLoadingService,
+            user: user,
+        )
         let userDetailVC = UserDetailViewController(with: viewModel)
         userDetailVC.coordinator = self
         navigationController.pushViewController(userDetailVC, animated: true)

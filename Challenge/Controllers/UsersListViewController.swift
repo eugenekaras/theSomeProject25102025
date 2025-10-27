@@ -182,6 +182,11 @@ class UsersListViewController: UIViewController {
         }
     }
     
+    // MARK: - Navigation
+    private func showUserDetail(for user: User) {
+        coordinator?.showUserDetail(for: user)
+    }
+    
     // MARK: - UI Updates
     private func updateUI() {
         DispatchQueue.main.async {
@@ -222,8 +227,8 @@ extension UsersListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if let detailVM = viewModel.viewModelForDetail(at: indexPath.row) {
-            coordinator?.showUserDetail(with: detailVM)
+        if let user = viewModel.user(at: indexPath.row) {
+            showUserDetail(for: user)
         }
     }
     

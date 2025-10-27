@@ -11,19 +11,20 @@ class UserDetailViewModel {
     // MARK: - Properties
     weak var delegate: UserDetailViewModelDelegate?
     
-    private(set) var user: User
+
     private let bookmarkService: BookmarkServiceProtocol
     private let imageLoadingService: ImageLoadingServiceProtocol
+    private(set) var user: User
     
     // MARK: - Initialization
     init(
-        user: User,
         bookmarkService: BookmarkServiceProtocol,
-        imageLoadingService: ImageLoadingServiceProtocol
+        imageLoadingService: ImageLoadingServiceProtocol,
+        user: User
     ) {
-        self.user = user
         self.bookmarkService = bookmarkService
         self.imageLoadingService = imageLoadingService
+        self.user = user
         setupNotifications()
     }
     

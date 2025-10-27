@@ -1,7 +1,21 @@
 import Foundation
 
+// MARK: - BookmarkService Protocol
+protocol BookmarkServiceProtocol: AnyObject {
+    var bookmarkedUsers: [User] { get }
+    var bookmarkedCount: Int { get }
+    
+    func isBookmarked(_ userID: String) -> Bool
+    func addBookmark(_ user: User)
+    func removeBookmark(_ user: User)
+    func toggleBookmark(_ user: User)
+    func clearAllBookmarks()
+    
+    static var bookmarkDidChangeNotification: NSNotification.Name { get }
+}
+
 // MARK: - BookmarkManager
-class BookmarkManager {
+class BookmarkManager: BookmarkServiceProtocol {
     static let shared = BookmarkManager()
     
     private let userDefaults = UserDefaults.standard

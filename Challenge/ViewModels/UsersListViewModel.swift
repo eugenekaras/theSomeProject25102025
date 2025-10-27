@@ -10,9 +10,14 @@ protocol UsersListViewModelDelegate: AnyObject {
 
 class UsersListViewModel {
     
-    // MARK: - Properties
+    // MARK: - Dependencies
+    private let apiService: APIServiceProtocol
+    private let bookmarkService: BookmarkServiceProtocol
+    
+    // MARK: - Delegate
     weak var delegate: UsersListViewModelDelegate?
     
+    // MARK: - Properties
     private(set) var users: [User] = []
     private(set) var filteredUsers: [User] = []
     private(set) var isSearching = false
@@ -28,9 +33,7 @@ class UsersListViewModel {
     }
     
     private var currentSearchText = ""
-    
-    private let apiService = APIService.shared
-    
+
     // MARK: - Computed Properties
     var currentUsers: [User] {
         return isSearching ? filteredUsers : users
@@ -42,6 +45,12 @@ class UsersListViewModel {
     
     var userCount: Int {
         return currentUsers.count
+    }
+    
+    // MARK: - Init
+    init(apiService: APIServiceProtocol = APIService.shared, bookmarkService: BookmarkServiceProtocol = BookmarkManager.shared) {
+        self.apiService = apiService
+        self.bookmarkService = bookmarkService
     }
     
     // MARK: - Public Methods
@@ -159,7 +168,7 @@ class UsersListViewModel {
         let user = dataSource[index]
         let userCellViewModel = UserCellViewModel(
             user: user,
-            isBookmarked: BookmarkManager.shared.isBookmarked(user.uniqueID)
+            isBookmarked: isBookmarked(withID: user.uniqueID)
         )
         return userCellViewModel
     }
@@ -172,13 +181,18 @@ class UsersListViewModel {
     /// Toggle bookmark for user at index
     func toggleBookmark(at index: Int) {
         guard let user = user(at: index) else { return }
-        BookmarkManager.shared.toggleBookmark(user)
+        bookmarkService.toggleBookmark(user)
     }
     
     /// Check if user at index is bookmarked
     func isBookmarked(at index: Int) -> Bool {
         guard let user = user(at: index) else { return false }
-        return BookmarkManager.shared.isBookmarked(user.uniqueID)
+        return bookmarkService.isBookmarked(user.uniqueID)
+    }
+    
+    /// Check if user at index is bookmarked with Id
+    func isBookmarked(withID id: String) -> Bool {
+        return bookmarkService.isBookmarked(id)
     }
 }
 

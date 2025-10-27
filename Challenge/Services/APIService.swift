@@ -1,6 +1,43 @@
 import Foundation
 import Network
 
+
+// MARK: - APIServiceProtocol
+protocol APIServiceProtocol: AnyObject {
+
+    // MARK: - Methods
+    func fetchUsers(
+        page: Int,
+        results: Int,
+        seed: String?,
+        retries: Int,
+        delay: Double,
+        completion: @escaping (Result<RandomUserResponse, NetworkError>) -> Void
+    )
+
+    func currentNetworkStatus() -> Bool
+}
+
+// MARK: - Convenience Methods
+extension APIServiceProtocol {
+    func fetchUsers(
+        page: Int,
+        seed: String?,
+        completion: @escaping (Result<RandomUserResponse, NetworkError>) -> Void
+    ) {
+        
+        /// Fetch users with default results, retries, and delay
+        fetchUsers(
+            page: page,
+            results: 25,
+            seed: seed,
+            retries: 2,
+            delay: 1.0,
+            completion: completion
+        )
+    }
+}
+
 // MARK: - NetworkError
 enum NetworkError: Error, LocalizedError {
     case invalidURL
@@ -29,7 +66,7 @@ enum NetworkError: Error, LocalizedError {
 }
 
 // MARK: - APIService
-class APIService {
+class APIService: APIServiceProtocol {
     static let shared = APIService()
     
     private let baseURL = "https://randomuser.me/api/"
@@ -58,7 +95,14 @@ class APIService {
     }
     
     // MARK: - Fetch Users
-    func fetchUsers(page: Int, results: Int = 25, seed: String? = nil, retries: Int = 2, delay: Double = 1.0, completion: @escaping (Result<RandomUserResponse, NetworkError>) -> Void) {
+    func fetchUsers(
+        page: Int,
+        results: Int = 25,
+        seed: String? = nil,
+        retries: Int = 2,
+        delay: Double = 1.0,
+        completion: @escaping (Result<RandomUserResponse, NetworkError>) -> Void
+    ) {
         
         guard isConnected else {
             completion(.failure(.noInternet))

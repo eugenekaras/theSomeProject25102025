@@ -86,6 +86,8 @@ class UserDetailViewController: UIViewController {
     
     deinit {
         // ViewModel handles its own cleanup
+        print("\(Self.self) deinitialized")
+        coordinator?.didFinishUserDetail()
     }
     
     // MARK: - Setup
@@ -313,15 +315,6 @@ class UserDetailViewController: UIViewController {
         return dateString
     }
     
-    private func setupNotifications() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(bookmarkDidChange),
-            name: BookmarkManager.bookmarkDidChangeNotification,
-            object: nil
-        )
-    }
-    
     // MARK: - Actions
     @objc private func bookmarkTapped() {
         viewModel.toggleBookmark()
@@ -339,10 +332,6 @@ class UserDetailViewController: UIViewController {
     @objc private func shareUser() {
         let shareText = viewModel.getShareText()
         coordinator?.presentShareActivity(with: [shareText], from: navigationItem.rightBarButtonItem?.customView)
-    }
-    
-    @objc private func bookmarkDidChange(_ notification: Notification) {
-        updateBookmarkButton()
     }
 }
 

@@ -23,6 +23,10 @@ class UserDetailCoordinator: Coordinator {
         self.user = user
     }
     
+    deinit {
+        print("\(Self.self) deinitialized")
+    }
+    
     func start() {
         showUserDetail()
     }

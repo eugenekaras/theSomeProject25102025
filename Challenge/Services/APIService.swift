@@ -1,6 +1,26 @@
 import Foundation
 import Network
 
+protocol URLSessionProtocol {
+    func dataTask(
+        with url: URL,
+        completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> URLSessionDataTaskProtocol
+}
+
+protocol URLSessionDataTaskProtocol {
+    func resume()
+}
+
+// MARK: - Conformance for production
+extension URLSession: URLSessionProtocol {
+    func dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
+        let task: URLSessionDataTask = dataTask(with: url, completionHandler: completionHandler)
+        return task as URLSessionDataTaskProtocol
+    }
+}
+
+extension URLSessionDataTask: URLSessionDataTaskProtocol {}
 
 // MARK: - APIServiceProtocol
 protocol APIServiceProtocol: AnyObject {
@@ -69,28 +89,30 @@ enum NetworkError: Error, LocalizedError {
 class APIService: APIServiceProtocol {
     
     private let baseURL = "https://randomuser.me/api/"
-    private let session: URLSession
-    
+    private let session: URLSessionProtocol
+
     // Network Monitor
-    private let monitor = NWPathMonitor()
-    private let monitorQueue = DispatchQueue(label: "NetworkMonitor")
-    private var isConnected: Bool = true
+    private let networkMonitor: NetworkMonitorProtocol
     
-    init() {
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
-        configuration.timeoutIntervalForResource = 60
-        self.session = URLSession(configuration: configuration)
-        
-        // Start network monitoring
-        monitor.pathUpdateHandler = { [weak self] path in
-            self?.isConnected = path.status == .satisfied
+    init(
+        session: URLSessionProtocol? = nil,
+        networkMonitor: NetworkMonitorProtocol = NetworkMonitor()
+    ) {
+        // If a session is not passed from outside, we create a custom one
+        if let session = session {
+            self.session = session
+        } else {
+            let configuration = URLSessionConfiguration.default
+            configuration.timeoutIntervalForRequest = 30
+            configuration.timeoutIntervalForResource = 60
+            self.session = URLSession(configuration: configuration)
         }
-        monitor.start(queue: monitorQueue)
+        self.networkMonitor = networkMonitor
+        self.networkMonitor.startMonitoring()
     }
     
     deinit {
-        monitor.cancel() // free up monitor
+        networkMonitor.stopMonitoring()
     }
     
     // MARK: - Fetch Users
@@ -103,7 +125,7 @@ class APIService: APIServiceProtocol {
         completion: @escaping (Result<RandomUserResponse, NetworkError>) -> Void
     ) {
         
-        guard isConnected else {
+        guard networkMonitor.isConnected else {
             completion(.failure(.noInternet))
             return
         }
@@ -166,6 +188,6 @@ class APIService: APIServiceProtocol {
     
     // MARK: - Current network status
     func currentNetworkStatus() -> Bool {
-        return isConnected
+        networkMonitor.isConnected
     }
 }

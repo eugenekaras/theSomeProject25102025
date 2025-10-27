@@ -30,6 +30,8 @@ class UserDetailViewModel {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        
+        print("\(Self.self) deinitialized")
     }
     
     // MARK: - Public Methods

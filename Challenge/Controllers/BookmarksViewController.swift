@@ -2,10 +2,10 @@ import UIKit
 
 class BookmarksViewController: UIViewController {
     
-    // MARK: - Properties
+    // MARK: - Dependencies
     weak var coordinator: BookmarksCoordinator?
-    private var viewModel = BookmarksViewModel()
-    private let imageService = ImageLoadingService.shared
+    private var viewModel: BookmarksViewModel
+    private let imageService: ImageLoadingServiceProtocol
     
     // MARK: - UI Elements
     private let tableView: UITableView = {
@@ -51,6 +51,17 @@ class BookmarksViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    // MARK: - Initialization
+    init(viewModel: BookmarksViewModel, imageService: ImageLoadingServiceProtocol) {
+        self.viewModel = viewModel
+        self.imageService = imageService
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {

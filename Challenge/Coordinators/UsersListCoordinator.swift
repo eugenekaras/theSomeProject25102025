@@ -1,11 +1,20 @@
 import UIKit
 
 class UsersListCoordinator: Coordinator {
+    
+    // MARK: - Dependencies
+    private let diContainer: DIContainer
+    
+    // MARK: - Navigation
     var navigationController: UINavigationController
+    
+    // MARK: - Coordinators
     private var userDetailCoordinator: UserDetailCoordinator?
     
-    init(navigationController: UINavigationController) {
+    // MARK: - Initialization
+    init(navigationController: UINavigationController, diContainer: DIContainer) {
         self.navigationController = navigationController
+        self.diContainer = diContainer
     }
     
     func start() {
@@ -13,7 +22,15 @@ class UsersListCoordinator: Coordinator {
     }
     
     private func showUsersList() {
-        let usersListVC = UsersListViewController()
+        let usersListViewModel = UsersListViewModel(
+              apiService: diContainer.apiService,
+              bookmarkService: diContainer.bookmarkService
+          )
+        
+        let usersListVC = UsersListViewController(
+            viewModel: usersListViewModel,
+            imageService: diContainer.imageLoadingService
+        )
         usersListVC.coordinator = self
         navigationController.pushViewController(usersListVC, animated: false)
     }

@@ -1,8 +1,13 @@
 import Foundation
 import UIKit
 
+// MARK: - ImageLoadingService Protocol
+protocol ImageLoadingServiceProtocol: AnyObject {
+    func loadImage(from urlString: String, completion: @escaping (UIImage?) -> Void)
+}
+
 // MARK: - Image Loading Service
-class ImageLoadingService {
+class ImageLoadingService: ImageLoadingServiceProtocol {
     static let shared = ImageLoadingService()
 
     private let cache = NSCache<NSString, UIImage>()

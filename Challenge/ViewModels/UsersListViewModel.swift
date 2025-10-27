@@ -48,7 +48,7 @@ class UsersListViewModel {
     }
     
     // MARK: - Init
-    init(apiService: APIServiceProtocol = APIService.shared, bookmarkService: BookmarkServiceProtocol = BookmarkManager.shared) {
+    init(apiService: APIServiceProtocol, bookmarkService: BookmarkServiceProtocol) {
         self.apiService = apiService
         self.bookmarkService = bookmarkService
     }

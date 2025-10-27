@@ -4,8 +4,12 @@ class BookmarksCoordinator: Coordinator {
     var navigationController: UINavigationController
     private var userDetailCoordinator: UserDetailCoordinator?
     
-    init(navigationController: UINavigationController) {
+    // MARK: - Dependencies
+    private let diContainer: DIContainer
+    
+    init(navigationController: UINavigationController, diContainer: DIContainer) {
         self.navigationController = navigationController
+        self.diContainer = diContainer
     }
     
     func start() {
@@ -13,7 +17,15 @@ class BookmarksCoordinator: Coordinator {
     }
     
     private func showBookmarks() {
-        let bookmarksVC = BookmarksViewController()
+        let bookmarksViewModel = BookmarksViewModel(
+              apiService: diContainer.apiService,
+              bookmarkService: diContainer.bookmarkService
+          )
+        
+        let bookmarksVC = BookmarksViewController(
+            viewModel: bookmarksViewModel,
+            imageService: diContainer.imageLoadingService
+        )
         bookmarksVC.coordinator = self
         navigationController.pushViewController(bookmarksVC, animated: false)
     }

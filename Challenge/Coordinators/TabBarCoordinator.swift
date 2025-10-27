@@ -1,15 +1,25 @@
 import UIKit
 
 class TabBarCoordinator: NSObject, Coordinator {
+    // MARK: - Dependencies
+    private let diContainer: DIContainer
+
+    // MARK: - UI
     var navigationController: UINavigationController
-    
     private(set) var tabBarController: UITabBarController
+    
+    // MARK: - Coordinators
     private var usersListCoordinator: UsersListCoordinator?
     private var bookmarksCoordinator: BookmarksCoordinator?
     
-    override init() {
-        self.navigationController = UINavigationController()
-        self.tabBarController = UITabBarController()
+    init(
+        diContainer: DIContainer,
+        navigationController: UINavigationController = UINavigationController(),
+        tabBarController: UITabBarController = UITabBarController()
+    ) {
+        self.diContainer = diContainer
+        self.navigationController = navigationController
+        self.tabBarController = tabBarController
         super.init()
     }
     
@@ -36,7 +46,10 @@ class TabBarCoordinator: NSObject, Coordinator {
     private func setupCoordinators() {
         // Users List Coordinator
         let usersListNavController = UINavigationController()
-        usersListCoordinator = UsersListCoordinator(navigationController: usersListNavController)
+        usersListCoordinator = UsersListCoordinator(
+            navigationController: usersListNavController,
+            diContainer: diContainer
+        )
 
         usersListNavController.tabBarItem = UITabBarItem(
             title: "Users",
@@ -46,7 +59,10 @@ class TabBarCoordinator: NSObject, Coordinator {
         
         // Bookmarks Coordinator
         let bookmarksNavController = UINavigationController()
-        bookmarksCoordinator = BookmarksCoordinator(navigationController: bookmarksNavController)
+        bookmarksCoordinator = BookmarksCoordinator(
+            navigationController: bookmarksNavController,
+            diContainer: diContainer
+        )
         
         bookmarksNavController.tabBarItem = UITabBarItem(
             title: "Bookmarks",
@@ -80,7 +96,7 @@ class TabBarCoordinator: NSObject, Coordinator {
     }
     
     private func updateBookmarkBadge() {
-        let bookmarkCount = BookmarkManager.shared.bookmarkedCount
+        let bookmarkCount = diContainer.bookmarkService.bookmarkedCount
         let bookmarkTab = tabBarController.viewControllers?[1]
         
         DispatchQueue.main.async {

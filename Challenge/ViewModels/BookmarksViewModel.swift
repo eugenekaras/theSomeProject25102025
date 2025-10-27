@@ -7,11 +7,14 @@ protocol BookmarksViewModelDelegate: AnyObject {
 
 class BookmarksViewModel {
     
-    // MARK: - Properties
+    // MARK: - Dependencies
+    private let apiService: APIServiceProtocol
+    private let bookmarkService: BookmarkServiceProtocol
+    
+    // MARK: - Delegate
     weak var delegate: BookmarksViewModelDelegate?
     
     private(set) var bookmarkedUsers: [User] = []
-    private let bookmarkManager = BookmarkManager.shared
     
     // MARK: - Computed Properties
     
@@ -31,7 +34,10 @@ class BookmarksViewModel {
     }
     
     // MARK: - Initialization
-    init() {
+    init(apiService: APIServiceProtocol, bookmarkService: BookmarkServiceProtocol) {
+        self.apiService = apiService
+        self.bookmarkService = bookmarkService
+        
         loadBookmarks()
     }
     
@@ -39,7 +45,7 @@ class BookmarksViewModel {
     
     /// Load bookmarks from storage
     func loadBookmarks() {
-        bookmarkedUsers = bookmarkManager.bookmarkedUsers
+        bookmarkedUsers = bookmarkService.bookmarkedUsers
         delegate?.didUpdateBookmarks()
     }
     
@@ -57,7 +63,7 @@ class BookmarksViewModel {
         let user = dataSource[index]
         let userCellViewModel = UserCellViewModel(
             user: user,
-            isBookmarked: BookmarkManager.shared.isBookmarked(user.uniqueID)
+            isBookmarked: bookmarkService.isBookmarked(user.uniqueID)
         )
         return userCellViewModel
     }
@@ -70,25 +76,25 @@ class BookmarksViewModel {
     /// Remove bookmark at specific index
     func removeBookmark(at index: Int) {
         guard let user = user(at: index) else { return }
-        bookmarkManager.removeBookmark(user)
+        bookmarkService.removeBookmark(user)
         // Note: bookmarks will be updated automatically via notification
     }
     
     /// Toggle bookmark for user at index
     func toggleBookmark(at index: Int) {
         guard let user = user(at: index) else { return }
-        bookmarkManager.toggleBookmark(user)
+        bookmarkService.toggleBookmark(user)
     }
     
     /// Check if user at index is bookmarked (should always be true in this context)
     func isBookmarked(at index: Int) -> Bool {
         guard let user = user(at: index) else { return false }
-        return bookmarkManager.isBookmarked(user.uniqueID)
+        return bookmarkService.isBookmarked(user.uniqueID)
     }
     
     /// Clear all bookmarks
     func clearAllBookmarks() {
-        bookmarkManager.clearAllBookmarks()
+        bookmarkService.clearAllBookmarks()
         // Note: bookmarks will be updated automatically via notification
     }
     

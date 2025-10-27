@@ -4,7 +4,7 @@ class UsersListViewController: UIViewController {
     
     // MARK: - Dependencies
     weak var coordinator: UsersListCoordinator?
-    private var viewModel: UsersListViewModel
+    private let viewModel: UsersListViewModel
     private let imageService: ImageLoadingServiceProtocol
     
     // MARK: - UI Elements

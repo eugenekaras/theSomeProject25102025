@@ -17,9 +17,9 @@ final class DIContainer {
 
     // MARK: - Initialization
     init(
-        apiService: APIServiceProtocol = APIService.shared,
-        bookmarkService: BookmarkServiceProtocol = BookmarkManager.shared,
-        imageLoadingService: ImageLoadingServiceProtocol = ImageLoadingService.shared
+        apiService: APIServiceProtocol = APIService(),
+        bookmarkService: BookmarkServiceProtocol = BookmarkManager(),
+        imageLoadingService: ImageLoadingServiceProtocol = ImageLoadingService()
     ) {
         self.apiService = apiService
         self.bookmarkService = bookmarkService

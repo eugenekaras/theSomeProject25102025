@@ -13,6 +13,7 @@ class UsersListViewModel {
     // MARK: - Dependencies
     private let apiService: APIServiceProtocol
     private let bookmarkService: BookmarkServiceProtocol
+    private let imageLoadingService: ImageLoadingServiceProtocol
     
     // MARK: - Delegate
     weak var delegate: UsersListViewModelDelegate?
@@ -48,9 +49,14 @@ class UsersListViewModel {
     }
     
     // MARK: - Init
-    init(apiService: APIServiceProtocol, bookmarkService: BookmarkServiceProtocol) {
+    init(
+        apiService: APIServiceProtocol,
+        bookmarkService: BookmarkServiceProtocol,
+        imageLoadingService: ImageLoadingServiceProtocol
+    ) {
         self.apiService = apiService
         self.bookmarkService = bookmarkService
+        self.imageLoadingService = imageLoadingService
     }
     
     // MARK: - Public Methods
@@ -199,7 +205,12 @@ class UsersListViewModel {
     func viewModelForDetail(at index: Int) -> UserDetailViewModel? {
         guard index < users.count else { return nil }
         let user = users[index]
-        return UserDetailViewModel(user: user)
+        let userDetailViewModel = UserDetailViewModel(
+            user: user,
+            bookmarkService: bookmarkService,
+            imageLoadingService: imageLoadingService
+        )
+        return userDetailViewModel
     }
 }
 

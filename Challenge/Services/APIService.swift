@@ -67,7 +67,6 @@ enum NetworkError: Error, LocalizedError {
 
 // MARK: - APIService
 class APIService: APIServiceProtocol {
-    static let shared = APIService()
     
     private let baseURL = "https://randomuser.me/api/"
     private let session: URLSession
@@ -77,7 +76,7 @@ class APIService: APIServiceProtocol {
     private let monitorQueue = DispatchQueue(label: "NetworkMonitor")
     private var isConnected: Bool = true
     
-    private init() {
+    init() {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30
         configuration.timeoutIntervalForResource = 60

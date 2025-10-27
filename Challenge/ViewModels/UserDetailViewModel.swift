@@ -12,12 +12,18 @@ class UserDetailViewModel {
     weak var delegate: UserDetailViewModelDelegate?
     
     private(set) var user: User
-    private let imageLoadingService = ImageLoadingService.shared
-    private let bookmarkManager = BookmarkManager.shared
+    private let bookmarkService: BookmarkServiceProtocol
+    private let imageLoadingService: ImageLoadingServiceProtocol
     
     // MARK: - Initialization
-    init(user: User) {
+    init(
+        user: User,
+        bookmarkService: BookmarkServiceProtocol,
+        imageLoadingService: ImageLoadingServiceProtocol
+    ) {
         self.user = user
+        self.bookmarkService = bookmarkService
+        self.imageLoadingService = imageLoadingService
         setupNotifications()
     }
     
@@ -48,7 +54,7 @@ class UserDetailViewModel {
     
     /// Check if user is currently bookmarked
     var isBookmarked: Bool {
-        return bookmarkManager.isBookmarked(user.uniqueID)
+        return bookmarkService.isBookmarked(user.uniqueID)
     }
     
     /// Get placeholder image with user initials
@@ -70,7 +76,7 @@ class UserDetailViewModel {
     
     /// Toggle bookmark status
     func toggleBookmark() {
-        bookmarkManager.toggleBookmark(user)
+        bookmarkService.toggleBookmark(user)
     }
     
     /// Get share text for the user

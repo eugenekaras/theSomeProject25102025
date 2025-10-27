@@ -8,12 +8,11 @@ protocol ImageLoadingServiceProtocol: AnyObject {
 
 // MARK: - Image Loading Service
 class ImageLoadingService: ImageLoadingServiceProtocol {
-    static let shared = ImageLoadingService()
 
     private let cache = NSCache<NSString, UIImage>()
     private let session: URLSession
 
-    private init() {
+    init() {
         cache.countLimit = 100
         cache.totalCostLimit = 1024 * 1024 * 100 // 100 MB
 

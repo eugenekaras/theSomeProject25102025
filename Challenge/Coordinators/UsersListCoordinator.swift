@@ -24,7 +24,8 @@ class UsersListCoordinator: Coordinator {
     private func showUsersList() {
         let usersListViewModel = UsersListViewModel(
               apiService: diContainer.apiService,
-              bookmarkService: diContainer.bookmarkService
+              bookmarkService: diContainer.bookmarkService,
+              imageLoadingService: diContainer.imageLoadingService
           )
         
         let usersListVC = UsersListViewController(

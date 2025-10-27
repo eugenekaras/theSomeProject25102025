@@ -16,7 +16,6 @@ protocol BookmarkServiceProtocol: AnyObject {
 
 // MARK: - BookmarkManager
 class BookmarkManager: BookmarkServiceProtocol {
-    static let shared = BookmarkManager()
     
     private let userDefaults = UserDefaults.standard
     private let bookmarksKey = "BookmarkedUsers"
@@ -24,7 +23,7 @@ class BookmarkManager: BookmarkServiceProtocol {
     // Notification for bookmark changes
     static let bookmarkDidChangeNotification = NSNotification.Name("BookmarkDidChange")
     
-    private init() {}
+    init() {}
     
     // MARK: - Public Methods
     

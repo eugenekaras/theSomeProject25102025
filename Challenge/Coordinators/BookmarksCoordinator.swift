@@ -19,7 +19,8 @@ class BookmarksCoordinator: Coordinator {
     private func showBookmarks() {
         let bookmarksViewModel = BookmarksViewModel(
               apiService: diContainer.apiService,
-              bookmarkService: diContainer.bookmarkService
+              bookmarkService: diContainer.bookmarkService,
+              imageLoadingService: diContainer.imageLoadingService
           )
         
         let bookmarksVC = BookmarksViewController(

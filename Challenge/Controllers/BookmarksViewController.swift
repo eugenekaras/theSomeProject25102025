@@ -4,7 +4,7 @@ class BookmarksViewController: UIViewController {
     
     // MARK: - Dependencies
     weak var coordinator: BookmarksCoordinator?
-    private var viewModel: BookmarksViewModel
+    private let viewModel: BookmarksViewModel
     private let imageService: ImageLoadingServiceProtocol
     
     // MARK: - UI Elements

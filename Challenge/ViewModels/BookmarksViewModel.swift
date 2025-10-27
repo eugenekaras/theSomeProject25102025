@@ -106,4 +106,11 @@ class BookmarksViewModel {
             subtitle: "Start bookmarking users to see them here"
         )
     }
+    
+    /// Get user detail  presentation model at specific index
+    func viewModelForDetail(at index: Int) -> UserDetailViewModel? {
+        guard index < bookmarkedUsers.count else { return nil }
+        let user = bookmarkedUsers[index]
+        return UserDetailViewModel(user: user)
+    }
 }

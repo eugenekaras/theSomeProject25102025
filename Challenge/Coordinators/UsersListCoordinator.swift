@@ -18,10 +18,10 @@ class UsersListCoordinator: Coordinator {
         navigationController.pushViewController(usersListVC, animated: false)
     }
     
-    func showUserDetail(for user: User) {
+    func showUserDetail(with viewModel: UserDetailViewModel) {
         userDetailCoordinator = UserDetailCoordinator(
             navigationController: navigationController,
-            user: user
+            viewModel: viewModel
         )
         userDetailCoordinator?.delegate = self
         userDetailCoordinator?.start()

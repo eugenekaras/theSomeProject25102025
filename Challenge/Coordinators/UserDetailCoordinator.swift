@@ -8,11 +8,11 @@ class UserDetailCoordinator: Coordinator {
     weak var delegate: UserDetailCoordinatorDelegate?
     var navigationController: UINavigationController
     
-    private let user: User
+    private let viewModel: UserDetailViewModel
     
-    init(navigationController: UINavigationController, user: User) {
+    init(navigationController: UINavigationController, viewModel: UserDetailViewModel) {
         self.navigationController = navigationController
-        self.user = user
+        self.viewModel = viewModel
     }
     
     func start() {
@@ -20,7 +20,7 @@ class UserDetailCoordinator: Coordinator {
     }
     
     private func showUserDetail() {
-        let userDetailVC = UserDetailViewController(user: user)
+        let userDetailVC = UserDetailViewController(with: viewModel)
         userDetailVC.coordinator = self
         navigationController.pushViewController(userDetailVC, animated: true)
     }

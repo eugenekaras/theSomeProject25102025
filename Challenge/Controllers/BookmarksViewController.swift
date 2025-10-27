@@ -194,13 +194,6 @@ class BookmarksViewController: UIViewController {
             self.viewModel.loadBookmarks()
         }
     }
-    
-    // MARK: - Navigation
-    private func showUserDetail(for user: User) {
-        coordinator?.showUserDetail(for: user)
-    }
-    
-
 }
 
 // MARK: - UITableViewDataSource
@@ -223,8 +216,6 @@ extension BookmarksViewController: UITableViewDataSource {
         
         return cell
     }
-    
-
 }
 
 // MARK: - UITableViewDelegate
@@ -232,12 +223,10 @@ extension BookmarksViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if let user = viewModel.user(at: indexPath.row) {
-            showUserDetail(for: user)
+        if let detailVM = viewModel.viewModelForDetail(at: indexPath.row) {
+            coordinator?.showUserDetail(with: detailVM)
         }
     }
-    
-
 }
 
 // MARK: - UserTableViewCellDelegate

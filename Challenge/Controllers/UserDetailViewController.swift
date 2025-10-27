@@ -67,8 +67,8 @@ class UserDetailViewController: UIViewController {
     }()
     
     // MARK: - Initialization
-    init(user: User) {
-        self.viewModel = UserDetailViewModel(user: user)
+    init(with viewModel: UserDetailViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     

@@ -194,6 +194,13 @@ class UsersListViewModel {
     func isBookmarked(withID id: String) -> Bool {
         return bookmarkService.isBookmarked(id)
     }
+    
+    /// Get user detail  presentation model at specific index
+    func viewModelForDetail(at index: Int) -> UserDetailViewModel? {
+        guard index < users.count else { return nil }
+        let user = users[index]
+        return UserDetailViewModel(user: user)
+    }
 }
 
 // MARK: - Helper Extensions

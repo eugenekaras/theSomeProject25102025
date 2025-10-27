@@ -5,8 +5,7 @@ class TabBarCoordinator: NSObject, Coordinator {
     private let diContainer: DIContainer
 
     // MARK: - UI
-    var navigationController: UINavigationController
-    private(set) var tabBarController: UITabBarController
+    private(set) var tabBarController: MainTabBarController
     
     // MARK: - Coordinators
     private var usersListCoordinator: UsersListCoordinator?
@@ -14,33 +13,16 @@ class TabBarCoordinator: NSObject, Coordinator {
     
     init(
         diContainer: DIContainer,
-        navigationController: UINavigationController = UINavigationController(),
-        tabBarController: UITabBarController = UITabBarController()
+        tabBarController: MainTabBarController
     ) {
         self.diContainer = diContainer
-        self.navigationController = navigationController
         self.tabBarController = tabBarController
         super.init()
     }
     
     func start() {
-        setupTabBar()
         setupCoordinators()
-    }
-    
-    private func setupTabBar() {
-        // Configure tab bar appearance
-        tabBarController.tabBar.tintColor = .systemBlue
-        tabBarController.tabBar.unselectedItemTintColor = .systemGray
-        
-        if #available(iOS 15.0, *) {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = .systemBackground
-            
-            tabBarController.tabBar.standardAppearance = appearance
-            tabBarController.tabBar.scrollEdgeAppearance = appearance
-        }
+        tabBarController.setupBookmarkBadgeObserver()
     }
     
     private func setupCoordinators() {
@@ -51,11 +33,7 @@ class TabBarCoordinator: NSObject, Coordinator {
             diContainer: diContainer
         )
 
-        usersListNavController.tabBarItem = UITabBarItem(
-            title: "Users",
-            image: UIImage(systemName: "person.2"),
-            selectedImage: UIImage(systemName: "person.2.fill")
-        )
+        usersListNavController.tabBarItem = UsersListCoordinator.makeTabBarItem()
         
         // Bookmarks Coordinator
         let bookmarksNavController = UINavigationController()
@@ -64,11 +42,7 @@ class TabBarCoordinator: NSObject, Coordinator {
             diContainer: diContainer
         )
         
-        bookmarksNavController.tabBarItem = UITabBarItem(
-            title: "Bookmarks",
-            image: UIImage(systemName: "bookmark"),
-            selectedImage: UIImage(systemName: "bookmark.fill")
-        )
+        bookmarksNavController.tabBarItem = BookmarksCoordinator.makeTabBarItem()
         
         // Set up tab bar view controllers
         tabBarController.viewControllers = [usersListNavController, bookmarksNavController]
@@ -76,39 +50,26 @@ class TabBarCoordinator: NSObject, Coordinator {
         // Start child coordinators
         usersListCoordinator?.start()
         bookmarksCoordinator?.start()
-        
-        // Setup bookmark badge observer
-        setupBookmarkBadgeObserver()
-        updateBookmarkBadge()
     }
-    
-    private func setupBookmarkBadgeObserver() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(bookmarkDidChange),
-            name: BookmarkManager.bookmarkDidChangeNotification,
-            object: nil
+}
+
+// MARK: - TabBarItem Factory
+extension UsersListCoordinator {
+    static func makeTabBarItem() -> UITabBarItem {
+        UITabBarItem(
+            title: "Users",
+            image: UIImage(systemName: "person.2"),
+            selectedImage: UIImage(systemName: "person.2.fill")
         )
     }
-    
-    @objc private func bookmarkDidChange(_ notification: Notification) {
-        updateBookmarkBadge()
-    }
-    
-    private func updateBookmarkBadge() {
-        let bookmarkCount = diContainer.bookmarkService.bookmarkedCount
-        let bookmarkTab = tabBarController.viewControllers?[1]
-        
-        DispatchQueue.main.async {
-            if bookmarkCount > 0 {
-                bookmarkTab?.tabBarItem.badgeValue = "\(bookmarkCount)"
-            } else {
-                bookmarkTab?.tabBarItem.badgeValue = nil
-            }
-        }
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
+}
+
+extension BookmarksCoordinator {
+    static func makeTabBarItem() -> UITabBarItem {
+        UITabBarItem(
+            title: "Bookmarks",
+            image: UIImage(systemName: "bookmark"),
+            selectedImage: UIImage(systemName: "bookmark.fill")
+        )
     }
 }

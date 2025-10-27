@@ -2,42 +2,31 @@ import UIKit
 
 class MainTabBarController: UITabBarController {
     
+    // MARK: - Dependencies
+    private let bookmarkService: BookmarkServiceProtocol
+    
+    // MARK: - Properties
     private var bookmarkBadgeObserver: NSObjectProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTabs()
         setupAppearance()
-        setupBookmarkBadgeObserver()
-        updateBookmarkBadge()
+    }
+    
+    // MARK: - Initialization
+    init(bookmarkService: BookmarkServiceProtocol) {
+        self.bookmarkService = bookmarkService
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     deinit {
         if let observer = bookmarkBadgeObserver {
             NotificationCenter.default.removeObserver(observer)
         }
-    }
-    
-    private func setupTabs() {
-        // Users List Tab
-        let usersListVC = UsersListViewController()
-        let usersNav = UINavigationController(rootViewController: usersListVC)
-        usersNav.tabBarItem = UITabBarItem(
-            title: "Users",
-            image: UIImage(systemName: "person.2"),
-            selectedImage: UIImage(systemName: "person.2.fill")
-        )
-        
-        // Bookmarks Tab
-        let bookmarksVC = BookmarksViewController()
-        let bookmarksNav = UINavigationController(rootViewController: bookmarksVC)
-        bookmarksNav.tabBarItem = UITabBarItem(
-            title: "Bookmarks",
-            image: UIImage(systemName: "bookmark"),
-            selectedImage: UIImage(systemName: "bookmark.fill")
-        )
-        
-        viewControllers = [usersNav, bookmarksNav]
     }
     
     private func setupAppearance() {
@@ -55,7 +44,9 @@ class MainTabBarController: UITabBarController {
         }
     }
     
-    private func setupBookmarkBadgeObserver() {
+    func setupBookmarkBadgeObserver() {
+        guard viewControllers != nil else { return }
+        
         bookmarkBadgeObserver = NotificationCenter.default.addObserver(
             forName: BookmarkManager.bookmarkDidChangeNotification,
             object: nil,
@@ -63,10 +54,12 @@ class MainTabBarController: UITabBarController {
         ) { [weak self] _ in
             self?.updateBookmarkBadge()
         }
+        
+        updateBookmarkBadge()
     }
     
     private func updateBookmarkBadge() {
-        let bookmarkCount = BookmarkManager.shared.bookmarkedCount
+        let bookmarkCount = bookmarkService.bookmarkedCount
         let bookmarkTab = viewControllers?[1]
         
         if bookmarkCount > 0 {

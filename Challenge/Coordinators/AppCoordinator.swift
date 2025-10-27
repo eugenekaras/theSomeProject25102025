@@ -12,7 +12,12 @@ class AppCoordinator: Coordinator {
     }
     
     func start() {
-        tabBarCoordinator = TabBarCoordinator(diContainer: diContainer)
+        let mainTabBarController = MainTabBarController(bookmarkService: diContainer.bookmarkService)
+        
+        tabBarCoordinator = TabBarCoordinator(
+            diContainer: diContainer,
+            tabBarController: mainTabBarController
+        )
         
         window.rootViewController = tabBarCoordinator.tabBarController
         window.makeKeyAndVisible()
